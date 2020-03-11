@@ -51,16 +51,20 @@ end
     Frame functions
 ]] --
 
-local perAltY = 15;
-local perInstanceX = 100;
-
 local topPanelHeight = 30
 local spacing = 5
 local padding = 5
-local font_height = perAltY
+
+function AltMythicList:GetFontSize()
+    return self.addon:GetFontSize()
+end
+
+function AltMythicList:GetInstanceWidth()
+    return self.addon:GetInstanceWidth()
+end
 
 function AltMythicList:CalculateWidth()
-    return (self:getDungeonCount() + 1) * perInstanceX;
+    return (self:getDungeonCount() + 1) * self:GetInstanceWidth();
 end
 
 function AltMythicList:CalculateHeight()
@@ -73,7 +77,7 @@ function AltMythicList:CalculateYOffset(i)
 end
 
 function AltMythicList:CalculatePlayerFrameHeight(i)
-    return (perAltY + padding * 2)
+    return (self:GetFontSize() + padding * 2)
 end
 
 function AltMythicList:UpdateData(data)
@@ -88,11 +92,16 @@ function AltMythicList:UpdateData(data)
         local alt = altContainer.alt.guid
 
         alt = data[alt]
+        altFrame.altName:GetFontString():SetFont("Fonts\\FRIZQT__.TTF", self:GetFontSize())
+        altFrame.altName:GetFontString():SetWidth(self:GetInstanceWidth())
 
         if altFrame ~= nil and altFrame.dungeons ~= nil then
             for dungeonIndex, dungeonFrame in pairs(altFrame.dungeons) do
                 if alt.dungeons ~= nil and alt.dungeons[dungeonIndex] ~= nil then
                     dungeonFrame:SetText(self:GetDungeonKeyLabel(alt.dungeons[dungeonIndex]))
+                    dungeonFrame:SetSize(self:GetInstanceWidth(), self:GetFontSize() + padding * 2)
+                    dungeonFrame:GetFontString():SetFont("Fonts\\FRIZQT__.TTF", self:GetFontSize())
+                    dungeonFrame:GetFontString():SetWidth(self:GetInstanceWidth())
                 end
             end
         end
@@ -169,10 +178,9 @@ function AltMythicList:MakeInstanceRow(frame)
     instanceContainer.background:SetDrawLayer("ARTWORK", 1);
     instanceContainer.background:SetColorTexture(255, 255, 255, 0.2);
 
-    instanceContainer:SetSize(frame:GetWidth(), font_height + padding * 2);
+    instanceContainer:SetSize(frame:GetWidth(), self:GetFontSize() + padding * 2);
     instanceContainer:ClearAllPoints()
     instanceContainer:SetPoint("TOP", frame);
-
 
     instanceContainer:Show();
 
@@ -184,15 +192,15 @@ function AltMythicList:MakeInstanceRow(frame)
 	    dungeonFrame:SetNormalFontObject("GameFontHighlightSmall")
 
         dungeonFrame:ClearAllPoints()
-        dungeonFrame:SetSize(perInstanceX, font_height + padding * 2)
-        dungeonFrame:SetPoint("LEFT", instanceContainer, "LEFT", (i) * perInstanceX, 0);
+        dungeonFrame:SetSize(self:GetInstanceWidth(), self:GetFontSize() + padding * 2)
+        dungeonFrame:SetPoint("LEFT", instanceContainer, "LEFT", (i) * self:GetInstanceWidth(), 0);
 
         local dungeonFrameFont = dungeonFrame:GetFontString()
-        dungeonFrameFont:SetFont("Fonts\\FRIZQT__.TTF", font_height)
+        dungeonFrameFont:SetFont("Fonts\\FRIZQT__.TTF", self:GetFontSize())
         dungeonFrameFont:SetJustifyH("CENTER");
         dungeonFrameFont:SetJustifyV("CENTER");
-        dungeonFrameFont:SetWidth(perInstanceX)
-        dungeonFrameFont:SetHeight(font_height)
+        dungeonFrameFont:SetWidth(self:GetInstanceWidth())
+        dungeonFrameFont:SetHeight(self:GetFontSize())
         i = i + 1
     end
 
@@ -212,19 +220,19 @@ function AltMythicList:MakeDungeonFrame(dungeon, index, altFrame)
         dungeonFrame.background:SetColorTexture(122, 0, 0, 0.1);
     end
 
-    dungeonFrame:SetSize(perInstanceX, font_height + padding*2)
+    dungeonFrame:SetSize(self:GetInstanceWidth(), self:GetFontSize() + padding*2)
     dungeonFrame:SetText(self:GetDungeonKeyLabel(dungeon))
     dungeonFrame:SetNormalFontObject("GameFontHighlightSmall")
     dungeonFrame:ClearAllPoints()
-    dungeonFrame:SetPoint("LEFT", altFrame, "LEFT", index * perInstanceX, 0);
+    dungeonFrame:SetPoint("LEFT", altFrame, "LEFT", index * self:GetInstanceWidth(), 0);
     dungeonFrame:SetPushedTextOffset(0, 0);
 
     local instanceFont = dungeonFrame:GetFontString()
-    instanceFont:SetFont("Fonts\\FRIZQT__.TTF", font_height)
+    instanceFont:SetFont("Fonts\\FRIZQT__.TTF", self:GetFontSize())
     instanceFont:SetJustifyH("CENTER");
     instanceFont:SetJustifyV("CENTER");
-    instanceFont:SetWidth(perInstanceX)
-    instanceFont:SetHeight(font_height)
+    instanceFont:SetWidth(self:GetInstanceWidth())
+    instanceFont:SetHeight(self:GetFontSize())
     dungeonFrame:Show();
 
     return dungeonFrame
@@ -242,7 +250,7 @@ function AltMythicList:MakeAltFrame(alt, altIndex, altsContainer, previousAltFra
     altFrame.background:SetDrawLayer("ARTWORK", 1);
 
     if altIndex % 2 ~= 0 then
-        altFrame.background:SetColorTexture(0, 0, 0, 0.3);
+        altFrame.background:SetColorTexture(0, 0, 0, 1);
     else
         altFrame.background:SetColorTexture(255, 255, 255, 0.1);
     end
@@ -257,7 +265,7 @@ function AltMythicList:MakeAltFrame(alt, altIndex, altsContainer, previousAltFra
 
     local altName = CreateFrame("BUTTON", nil, altFrame)
     altFrame.altName = altName
-    altName:SetSize(perInstanceX, font_height)
+    altName:SetSize(self:GetInstanceWidth(), self:GetFontSize())
     altName:SetText(alt.name)
     altName:SetNormalFontObject("GameFontHighlightSmall")
     altName:ClearAllPoints()
@@ -265,11 +273,11 @@ function AltMythicList:MakeAltFrame(alt, altIndex, altsContainer, previousAltFra
     altName:SetPushedTextOffset(0, 0);
     local altNameFont = altName:GetFontString()
     local color = self:GetCharColor(alt.class)
-    altNameFont:SetFont("Fonts\\FRIZQT__.TTF", font_height)
+    altNameFont:SetFont("Fonts\\FRIZQT__.TTF", self:GetFontSize())
     altNameFont:SetJustifyH("CENTER");
     altNameFont:SetJustifyV("CENTER");
-    altNameFont:SetWidth(perInstanceX)
-    altNameFont:SetHeight(font_height)
+    altNameFont:SetWidth(self:GetInstanceWidth())
+    altNameFont:SetHeight(self:GetFontSize())
     altNameFont:SetTextColor(color.r, color.g, color.b, 1);
     altName:Show()
 

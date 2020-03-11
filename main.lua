@@ -4,11 +4,19 @@ local addonName, AltMythicList = ...;
 _G["AltMythicList"] = AltMythicList;
 
 local addon = LibStub("AceAddon-3.0"):NewAddon(addonName, "AceConsole-3.0", "AceEvent-3.0")
-
 AltMythicList.addon = addon
-function addon:OnInitialize()
 
-    AltMythicList.db = LibStub("AceDB-3.0"):New("AltMythicListDB")
+function addon:OnInitialize()
+    local defaults = {
+        global = {
+            options = {
+                fontSize = 15,
+                instanceWidth = 100
+            }
+        }
+    }
+
+    AltMythicList.db = LibStub("AceDB-3.0"):New("AltMythicListDB", defaults, true)
     AltMythicList:BuildMainFrame()
 
     local dungeonCount = 0
@@ -20,23 +28,7 @@ function addon:OnInitialize()
     addon:RegisterChatCommand("alts", "OnCommand")
 
     addon:RegisterEvent("PLAYER_LOGIN", "OnLogin")
-
-    local options = {
-        name = 'addon',
-        handler = addon,
-        type = 'group',
-        args = {
-            msg = {
-                type = 'input',
-                name = 'My Message',
-                desc = 'The message for my addon',
-                set = 'SetMessage',
-                get = 'GetMessage',
-            }
-        }
-    }
-
-    LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options, {"altsconfig"})
+    addon:SetupConfig()
 end
 
 function addon:OnEnable()
@@ -52,15 +44,35 @@ function addon:OnDisable()
     -- Called when the addon is disabled
 end
 
-function addon:GetMessage()
-    return "RANDOM MESSAGE"
-end
+function addon:SetupConfig()
+    local options = {
+        name = 'addon',
+        handler = addon,
+        type = 'group',
+        args = {
+            fontSize = {
+                type = 'range',
+                name = 'Fontsize',
+                desc = 'Font size for the list',
+                set = 'SetFontSize',
+                get = 'GetFontSize',
+            },
+            instanceWidth = {
+                type = 'range',
+                name = 'instanceWidth',
+                min = 10,
+                max = 1000,
+                desc = 'The width of each instance column',
+                set = 'SetInstanceWidth',
+                get = 'GetInstanceWidth',
+            }
+        }
+    }
 
-function addon:SetMessage(info, input)
-    self:Print(info)
-    self:Print(input)
-end
+    LibStub("AceConfig-3.0"):RegisterOptionsTable(addonName, options)
 
+    self.optionsFrame = LibStub("AceConfigDialog-3.0"):AddToBlizOptions(addonName, addonName)
+end
 
 function addon:OnLogin()
     AltMythicList:GatherData()
@@ -71,6 +83,8 @@ function addon:OnCommand(input)
 	if input == "purge" then
         AltMythicList:HideInterface();
         AltMythicList:PurgeDB();
+    elseif input == "config" then
+        InterfaceOptionsFrame_OpenToCategory(self.optionsFrame)
     else
         AltMythicList:ShowInterface();
     end
@@ -212,6 +226,24 @@ function AltMythicList:GetCompletionLevelFromTime(maxTime, elapsedTime)
   return '-'
 
 end
+
+--[[ Options getter and setter ]] --
+function addon:SetFontSize(info, value)
+    AltMythicList.db.global.options.fontSize = value
+end
+
+function addon:GetFontSize(info)
+    return AltMythicList.db.global.options.fontSize
+end
+
+function addon:SetInstanceWidth(info, value)
+    AltMythicList.db.global.options.instanceWidth = value
+end
+
+function addon:GetInstanceWidth(info)
+    return AltMythicList.db.global.options.instanceWidth
+end
+
 
 -- [[ Database ]] --
 
