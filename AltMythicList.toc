@@ -1,7 +1,7 @@
 ## Interface: 80300
 ## Title: AltMythicList
-## Author: Helfull
-## Version: 0.1
+## Author: @project-author@
+## Version: @project-version@
 ## SavedVariables: AltMythicListDB
 ## Dependencies: Ace3
 

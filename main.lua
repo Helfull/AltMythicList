@@ -21,7 +21,6 @@ function addon:OnInitialize()
 
     addon:RegisterEvent("PLAYER_LOGIN", "OnLogin")
 
-
     local options = {
         name = 'addon',
         handler = addon,
