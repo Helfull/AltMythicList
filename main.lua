@@ -127,26 +127,28 @@ function AltMythicList:GatherData()
     db.alts = db.alts or {}
     db.altCount = db.altCount or 0
 
-    local playerGuid = UnitGUID('player')
+    local altGuid = UnitGUID('player')
 
-    if playerGuid == nil then return end
+    if altGuid == nil then return end
 
-    local playerName = UnitName('player')
+    local altName = UnitName('player')
+
+    local _, altClass = UnitClass('player');
 
     local player = {
-        ["guid"] = playerGuid,
-        ["name"] = playerName,
-        ["class"] = UnitClass('player'),
+        ["guid"] = altGuid,
+        ["name"] = altName,
+        ["class"] = altClass,
         ["dungeons"] = {}
     }
 
     player.dungeons = self:GatherDungeonData(player)
 
-    if not self:CharExists(playerGuid) then
+    if not self:CharExists(altGuid) then
         db.altCount = db.altCount + 1
-        db.alts[playerGuid] = player
+        db.alts[altGuid] = player
     else
-        db.alts[playerGuid] = player
+        db.alts[altGuid] = player
     end
 
     return db.alts

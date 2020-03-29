@@ -28,14 +28,7 @@ function AltMythicList:GetNormalizedCharClass(class)
 end
 
 function AltMythicList:GetCharColor(class)
-    local normalizedClass = self:GetNormalizedCharClass(class)
-
-    local color = RAID_CLASS_COLORS[normalizedClass:upper()]
-    if color ~= nil then
-        return color
-    end
-
-    color = RAID_CLASS_COLORS[normalizedClass]
+    color = RAID_CLASS_COLORS[class]
     if color ~= nil then
         return color
     end
