@@ -28,6 +28,8 @@ function addon:OnInitialize()
     addon:RegisterChatCommand("alts", "OnCommand")
 
     addon:RegisterEvent("ADDON_LOADED")
+
+    addon:RegisterEvent("PLAYER_ENTERING_WORLD", "OnLogin")
     addon:SetupConfig()
 end
 
