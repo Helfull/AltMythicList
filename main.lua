@@ -27,7 +27,7 @@ function addon:OnInitialize()
 
     addon:RegisterChatCommand("alts", "OnCommand")
 
-    addon:RegisterEvent("PLAYER_LOGIN", "OnLogin")
+    addon:RegisterEvent("ADDON_LOADED")
     addon:SetupConfig()
 end
 
@@ -79,6 +79,12 @@ function addon:OnLogin()
     AltMythicList:SetupFrame()
 end
 
+function addon:ADDON_LOADED(_, addonName)
+    if addonName == "RaiderIO" then
+        addon.RaiderIOLoaded = true;
+    end
+end
+
 function addon:OnCommand(input)
 	if input == "purge" then
         AltMythicList:HideInterface();
@@ -107,6 +113,26 @@ end
 
 function AltMythicList:HideInterface()
 	self.main_frame:Hide();
+end
+
+function AltMythicList:getRaiderIOProfile()
+    if self.RaiderIOLoaded == false then
+        return ''
+    end
+
+    if RaiderIO.HasPlayerProfile("player") then
+        return RaiderIO.GetPlayerProfile(RaiderIO.ProfileOutput.MYTHICPLUS, "player")
+    end
+
+    return ''
+end
+
+function AltMythicList:getRaiderIOScore()
+    local rio = self:getRaiderIOProfile()
+    if type(rio) ~= 'table' then
+        return rio
+    end
+    return rio.profile.mplusCurrent.score;
 end
 
 function AltMythicList:getDungeonCount()
